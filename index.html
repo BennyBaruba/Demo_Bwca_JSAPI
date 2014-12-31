@@ -51,7 +51,7 @@
                         //zoom: 9
                     });
 
-                    var tiled_BlowdownAreas = new Tiled("http://tiles.arcgis.com/tiles/vq6gDtLASJCfTxvY/arcgis/rest/services/BlowdownAreas/MapServer");
+                    var tiled_BlowdownAreas = new Tiled("http://tiles.arcgis.com/tiles/vq6gDtLASJCfTxvY/arcgis/rest/services/BlowdownAreas/MapServer", {opacity:0.5});
                     map.addLayer(tiled_BlowdownAreas);
 
 
@@ -61,13 +61,13 @@
                     });
                     dynamicMapServiceLayer_PublicLands.setVisibleLayers([3]);
 
-                    map.addLayer(dynamicMapServiceLayer_PublicLands);
+                    //map.addLayer(dynamicMapServiceLayer_PublicLands);
 
                     var featureLayer_BWCABND = new FeatureLayer("http://services.arcgis.com/vq6gDtLASJCfTxvY/arcgis/rest/services/Bwca/FeatureServer/5", {
                     });
                     map.addLayer(featureLayer_BWCABND);
 
-                    var featureLayer_Fire = new FeatureLayer("http://services.arcgis.com/vq6gDtLASJCfTxvY/arcgis/rest/services/Bwca/FeatureServer/3", {
+                    var featureLayer_Fire = new FeatureLayer("http://services.arcgis.com/vq6gDtLASJCfTxvY/arcgis/rest/services/Bwca/FeatureServer/3", {opacity:0.5
                     });
                     map.addLayer(featureLayer_Fire);
 
@@ -79,7 +79,10 @@
                     });
                     map.addLayer(featureLayer_Campsite);
 
+                    var infoTemplate = new InfoTemplate("${NAME}", "Entry Point Number:  ${ENTRY_NUMBER:NumberFormat}");
                     var featureLayer_EntryPoint = new FeatureLayer("http://services.arcgis.com/vq6gDtLASJCfTxvY/arcgis/rest/services/Bwca/FeatureServer/0", {
+                        outFields: ["*"],
+                        infoTemplate: infoTemplate
                     });
                     map.addLayer(featureLayer_EntryPoint);
 
