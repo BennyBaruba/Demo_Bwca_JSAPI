@@ -12,6 +12,7 @@
             margin: 0;
             padding: 0;
         }
+
         body {
             background-color: #FFF;
             overflow: hidden;
@@ -22,13 +23,75 @@
     <script>
         var map;
 
-        require(["esri/map", "dojo/domReady!"], function(Map) {
-            map = new Map("map", {
-                basemap: "topo",
-                center: [-122.45, 37.75], // longitude, latitude
-                zoom: 13
-            });
-        });
+        require(["esri/map",
+                    "esri/layers/ArcGISTiledMapServiceLayer",
+                    "esri/layers/ArcGISDynamicMapServiceLayer",
+                    "esri/layers/FeatureLayer",
+                    "esri/InfoTemplate",
+                    "esri/geometry/Extent",
+                    "esri/SpatialReference",
+
+                    "dojo/domReady!"],
+                function (Map,
+                          Tiled,
+                          ArcGISDynamicMapServiceLayer,
+                          FeatureLayer,
+                          InfoTemplate,
+                          Extent,
+                          SpatialReference) {
+
+
+                    var setExtent = new Extent(-10403509, 5993812, -9933880, 6210894,
+                            new SpatialReference({wkid: 102100}));
+
+                    map = new Map("map", {
+                        basemap: "topo",
+                        extent: setExtent
+                        //center: [-91.8558, 47.9022], // longitude, latitude 47.9022° N, 91.8558° W
+                        //zoom: 9
+                    });
+
+                    var tiled_BlowdownAreas = new Tiled("http://tiles.arcgis.com/tiles/vq6gDtLASJCfTxvY/arcgis/rest/services/BlowdownAreas/MapServer");
+                    map.addLayer(tiled_BlowdownAreas);
+
+
+                //Takes a URL to a non cached map service.
+                    var dynamicMapServiceLayer_PublicLands = new ArcGISDynamicMapServiceLayer("http://sampleserver6.arcgisonline.com/arcgis/rest/services/USA/MapServer", {
+                        "opacity": 0.5
+                    });
+                    dynamicMapServiceLayer_PublicLands.setVisibleLayers([3]);
+
+                    map.addLayer(dynamicMapServiceLayer_PublicLands);
+
+                    var featureLayer_BWCABND = new FeatureLayer("http://services.arcgis.com/vq6gDtLASJCfTxvY/arcgis/rest/services/Bwca/FeatureServer/5", {
+                    });
+                    map.addLayer(featureLayer_BWCABND);
+
+                    var featureLayer_Fire = new FeatureLayer("http://services.arcgis.com/vq6gDtLASJCfTxvY/arcgis/rest/services/Bwca/FeatureServer/3", {
+                    });
+                    map.addLayer(featureLayer_Fire);
+
+                    var featureLayer_PortageTrail = new FeatureLayer("http://services.arcgis.com/vq6gDtLASJCfTxvY/arcgis/rest/services/Bwca/FeatureServer/2", {
+                    });
+                    map.addLayer(featureLayer_PortageTrail);
+
+                    var featureLayer_Campsite = new FeatureLayer("http://services.arcgis.com/vq6gDtLASJCfTxvY/arcgis/rest/services/Bwca/FeatureServer/1", {
+                    });
+                    map.addLayer(featureLayer_Campsite);
+
+                    var featureLayer_EntryPoint = new FeatureLayer("http://services.arcgis.com/vq6gDtLASJCfTxvY/arcgis/rest/services/Bwca/FeatureServer/0", {
+                    });
+                    map.addLayer(featureLayer_EntryPoint);
+
+
+                /*    var infoTemplate = new InfoTemplate("${state_name}", "Population (2000):  ${pop2000:NumberFormat}");
+                    mode: FeatureLayer.MODE_ONDEMAND,
+                            outFields: ["*"],
+                            infoTemplate: infoTemplate
+                    map.infoWindow.resize(155, 75);*/
+
+
+                });
     </script>
 </head>
 
