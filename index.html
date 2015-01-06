@@ -19,12 +19,14 @@
             overflow: hidden;
             font-family: "Trebuchet MS";
         }
+
         #HomeButton {
             position: absolute;
             top: 95px;
             left: 20px;
             z-index: 50;
         }
+
         #LocateButton {
             position: absolute;
             top: 140px;
@@ -73,7 +75,6 @@
                           Scalebar,
                           parser) {
 
-
                     var setExtent = new Extent(-10403509, 5993812, -9933880, 6210894,
                             new SpatialReference({wkid: 102100}));
 
@@ -85,33 +86,28 @@
                         //center: [-91.8558, 47.9022], // longitude, latitude 47.9022° N, 91.8558° W
                         //zoom: 9
                     });
-
-                    var tiled_BlowdownAreas = new Tiled("http://tiles.arcgis.com/tiles/vq6gDtLASJCfTxvY/arcgis/rest/services/BlowdownAreas/MapServer", {opacity:0.5});
+                    //Adding Layers
+                    var tiled_BlowdownAreas = new Tiled("http://tiles.arcgis.com/tiles/vq6gDtLASJCfTxvY/arcgis/rest/services/BlowdownAreas/MapServer", {opacity: 0.5});
                     map.addLayer(tiled_BlowdownAreas);
 
-
-                //Takes a URL to a non cached map service.
+                    //Takes a URL to a non cached map service.
                     var dynamicMapServiceLayer_PublicLands = new ArcGISDynamicMapServiceLayer("http://sampleserver6.arcgisonline.com/arcgis/rest/services/USA/MapServer", {
                         "opacity": 0.5
                     });
                     dynamicMapServiceLayer_PublicLands.setVisibleLayers([3]);
 
-                    //map.addLayer(dynamicMapServiceLayer_PublicLands);
-
-                    var featureLayer_BWCABND = new FeatureLayer("http://services.arcgis.com/vq6gDtLASJCfTxvY/arcgis/rest/services/Bwca/FeatureServer/5", {
-                    });
+                    var featureLayer_BWCABND = new FeatureLayer("http://services.arcgis.com/vq6gDtLASJCfTxvY/arcgis/rest/services/Bwca/FeatureServer/5", {});
                     map.addLayer(featureLayer_BWCABND);
 
-                    var featureLayer_Fire = new FeatureLayer("http://services.arcgis.com/vq6gDtLASJCfTxvY/arcgis/rest/services/Bwca/FeatureServer/3", {opacity:0.5
+                    var featureLayer_Fire = new FeatureLayer("http://services.arcgis.com/vq6gDtLASJCfTxvY/arcgis/rest/services/Bwca/FeatureServer/3", {
+                        opacity: 0.5
                     });
                     map.addLayer(featureLayer_Fire);
 
-                    var featureLayer_PortageTrail = new FeatureLayer("http://services.arcgis.com/vq6gDtLASJCfTxvY/arcgis/rest/services/Bwca/FeatureServer/2", {
-                    });
+                    var featureLayer_PortageTrail = new FeatureLayer("http://services.arcgis.com/vq6gDtLASJCfTxvY/arcgis/rest/services/Bwca/FeatureServer/2", {});
                     map.addLayer(featureLayer_PortageTrail);
 
-                    var featureLayer_Campsite = new FeatureLayer("http://services.arcgis.com/vq6gDtLASJCfTxvY/arcgis/rest/services/Bwca/FeatureServer/1", {
-                    });
+                    var featureLayer_Campsite = new FeatureLayer("http://services.arcgis.com/vq6gDtLASJCfTxvY/arcgis/rest/services/Bwca/FeatureServer/1", {});
                     map.addLayer(featureLayer_Campsite);
 
                     var infoTemplate = new InfoTemplate("${NAME}", "Entry Point Number:  ${ENTRY_NUMBER:NumberFormat}");
@@ -121,14 +117,7 @@
                     });
                     map.addLayer(featureLayer_EntryPoint);
 
-
-                /*    var infoTemplate = new InfoTemplate("${state_name}", "Population (2000):  ${pop2000:NumberFormat}");
-                    mode: FeatureLayer.MODE_ONDEMAND,
-                            outFields: ["*"],
-                            infoTemplate: infoTemplate
-                    map.infoWindow.resize(155, 75);*/
-
-                //Map related widgets
+                    //Map related widgets
                     //add the basemap gallery
                     var basemapGallery = new BasemapGallery({
                         showArcGISBasemaps: true,
@@ -136,7 +125,7 @@
                     }, "basemapGallery");
                     basemapGallery.startup();
 
-                    basemapGallery.on("error", function(msg) {
+                    basemapGallery.on("error", function (msg) {
                         console.log("basemap gallery error:  ", msg);
                     });
                     //Add a Home button
@@ -146,10 +135,10 @@
                     home.startup();
 
                     //Add Locate button
-                        geoLocate = new LocateButton({
-                            map: map
-                        }, "LocateButton");
-                        geoLocate.startup();
+                    geoLocate = new LocateButton({
+                        map: map
+                    }, "LocateButton");
+                    geoLocate.startup();
 
                     //Add overviewmap
                     var overviewMapDijit = new OverviewMap({
@@ -167,19 +156,19 @@
                         scalebarUnit: "dual"
                     });
 
-                    });
-</script>
+                });
+    </script>
 <body class="claro">
 <div id="map">
-<div style="position:absolute; right:20px; top:10px; z-Index:999;">
-    <div data-dojo-type="dijit/TitlePane"
-         data-dojo-props="title:'Switch Basemap', closable:false, open:false">
-        <div data-dojo-type="dijit/layout/ContentPane" style="width:380px; height:500px; overflow:auto;">
-            <div id="basemapGallery"></div>
+    <div style="position:absolute; right:20px; top:10px; z-Index:999;">
+        <div data-dojo-type="dijit/TitlePane"
+             data-dojo-props="title:'Switch Basemap', closable:false, open:false">
+            <div data-dojo-type="dijit/layout/ContentPane" style="width:380px; height:500px; overflow:auto;">
+                <div id="basemapGallery"></div>
+            </div>
         </div>
-    </div>
 
-</div>
+    </div>
     <div id="HomeButton"></div>
     <div id="LocateButton"></div>
 </div>
