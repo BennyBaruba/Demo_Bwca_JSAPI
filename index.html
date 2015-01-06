@@ -75,16 +75,16 @@
                           Scalebar,
                           parser) {
 
-                    var setExtent = new Extent(-10403509, 5993812, -9933880, 6210894,
-                            new SpatialReference({wkid: 102100}));
+                    //var setExtent = new Extent(-10403509, 5993812, -9933880, 6210894,
+                            //new SpatialReference({wkid: 102100}));
 
                     parser.parse();
 
                     map = new Map("map", {
                         basemap: "topo",
-                        extent: setExtent
-                        //center: [-91.8558, 47.9022], // longitude, latitude 47.9022° N, 91.8558° W
-                        //zoom: 9
+                        //extent: setExtent
+                        center: [-91.436, 47.980], // longitude, latitude 47.9022° N, 91.8558° W
+                        zoom: 10
                     });
                     //Adding Layers
                     var tiled_BlowdownAreas = new Tiled("http://tiles.arcgis.com/tiles/vq6gDtLASJCfTxvY/arcgis/rest/services/BlowdownAreas/MapServer", {opacity: 0.5});
