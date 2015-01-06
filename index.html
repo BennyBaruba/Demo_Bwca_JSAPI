@@ -4,6 +4,7 @@
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <meta name="viewport" content="initial-scale=1, maximum-scale=1,user-scalable=no"/>
     <title>Simple Map</title>
+    <link rel="stylesheet" href="http://js.arcgis.com/3.12/dijit/themes/claro/claro.css">
     <link rel="stylesheet" href="http://js.arcgis.com/3.12/esri/css/esri.css">
     <style>
         html, body, #map {
@@ -18,6 +19,18 @@
             overflow: hidden;
             font-family: "Trebuchet MS";
         }
+        #HomeButton {
+            position: absolute;
+            top: 95px;
+            left: 20px;
+            z-index: 50;
+        }
+        #LocateButton {
+            position: absolute;
+            top: 140px;
+            left: 20px;
+            z-index: 50;
+        }
     </style>
     <script src="http://js.arcgis.com/3.12/"></script>
     <script>
@@ -30,6 +43,19 @@
                     "esri/InfoTemplate",
                     "esri/geometry/Extent",
                     "esri/SpatialReference",
+                    "esri/arcgis/utils",
+
+                    "esri/dijit/BasemapGallery",
+                    "esri/dijit/HomeButton",
+                    "esri/dijit/LocateButton",
+                    "esri/dijit/OverviewMap",
+                    "esri/dijit/Scalebar",
+
+                    "dojo/parser",
+
+                    //"dijit/layout/BorderContainer",
+                    //"dijit/layout/ContentPane",
+                    //"dijit/TitlePane",
 
                     "dojo/domReady!"],
                 function (Map,
@@ -38,11 +64,20 @@
                           FeatureLayer,
                           InfoTemplate,
                           Extent,
-                          SpatialReference) {
+                          SpatialReference,
+                          utils,
+                          BasemapGallery,
+                          HomeButton,
+                          LocateButton,
+                          OverviewMap,
+                          Scalebar,
+                          parser) {
 
 
                     var setExtent = new Extent(-10403509, 5993812, -9933880, 6210894,
                             new SpatialReference({wkid: 102100}));
+
+                    parser.parse();
 
                     map = new Map("map", {
                         basemap: "topo",
@@ -93,12 +128,61 @@
                             infoTemplate: infoTemplate
                     map.infoWindow.resize(155, 75);*/
 
+                //Map related widgets
+                    //add the basemap gallery
+                    var basemapGallery = new BasemapGallery({
+                        showArcGISBasemaps: true,
+                        map: map
+                    }, "basemapGallery");
+                    basemapGallery.startup();
 
-                });
-    </script>
-</head>
+                    basemapGallery.on("error", function(msg) {
+                        console.log("basemap gallery error:  ", msg);
+                    });
+                    //Add a Home button
+                    var home = new HomeButton({
+                        map: map
+                    }, "HomeButton");
+                    home.startup();
 
-<body>
-<div id="map"></div>
+                    //Add Locate button
+                        geoLocate = new LocateButton({
+                            map: map
+                        }, "LocateButton");
+                        geoLocate.startup();
+
+                    //Add overviewmap
+                    var overviewMapDijit = new OverviewMap({
+                        map: map,
+                        visible: false
+                    });
+                    overviewMapDijit.startup();
+
+                    //Add scalebar
+                    var scalebar = new Scalebar({
+                        map: map,
+                        // "dual" displays both miles and kilmometers
+                        // "english" is the default, which displays miles
+                        // use "metric" for kilometers
+                        scalebarUnit: "dual"
+                    });
+
+                    });
+</script>
+<body class="claro">
+<div id="map">
+<div style="position:absolute; right:20px; top:10px; z-Index:999;">
+    <div data-dojo-type="dijit/TitlePane"
+         data-dojo-props="title:'Switch Basemap', closable:false, open:false">
+        <div data-dojo-type="dijit/layout/ContentPane" style="width:380px; height:500px; overflow:auto;">
+            <div id="basemapGallery"></div>
+        </div>
+    </div>
+
+</div>
+    <div id="HomeButton"></div>
+    <div id="LocateButton"></div>
+</div>
+
 </body>
 </html>
