@@ -23,10 +23,18 @@
             left: 20px;
             z-index: 50;
         }
+        #geocode{
+            display: block;
+            position: absolute;
+            z-index: 2;
+            top: 20px;
+            left: 74px;
+        }
     </style>
     <script src="http://js.arcgis.com/3.12/"></script>
     <script>
         var map;
+
 
         require(["esri/map",
             "esri/layers/ArcGISTiledMapServiceLayer",
@@ -36,10 +44,17 @@
             "esri/layers/FeatureLayer",
             "esri/dijit/BasemapToggle",
             "esri/dijit/OverviewMap",
+            "esri/dijit/Geocoder",
+            "esri/graphic",
+            "esri/symbols/SimpleMarkerSymbol",
+            "esri/symbols/SimpleLineSymbol",
+            "esri/Color",
 
             "dojo/domReady!"], function
                 (Map,Tiled,ArcGISDynamicMapServiceLayer, Extent,
-                 SpatialReference,FeatureLayer,BasemapToggle,OverviewMap) {
+                 SpatialReference,FeatureLayer,BasemapToggle,OverviewMap,Geocoder,Graphic,SimpleMarkerSymbol,
+                SimpleLineSymbol,
+                Color) {
 
             var setExtent = new Extent(-10403509, 5993812, -9933880, 6210894,
                     new SpatialReference({wkid: 102100}));
@@ -67,6 +82,23 @@
 
             map.addLayer(featureLayerBWCABND);
 
+            //graphics
+
+            map.on("click", addRedPoint);
+
+            function addRedPoint(evt) {
+                map.graphics.clear();
+                var pointSymbol = new SimpleMarkerSymbol();
+                pointSymbol.setSize(14);
+                pointSymbol.setOutline(new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID, new Color([255, 0, 0]), 1));
+                pointSymbol.setColor(new Color([255, 0, 0, 0.25]));
+
+                var graphic = new Graphic(evt.mapPoint, pointSymbol);
+                map.graphics.add(graphic);
+            }
+
+
+
             //Add widget
             var toggle = new BasemapToggle({
                 map: map,
@@ -80,6 +112,12 @@
             });
             overviewMapDijit.startup();
 
+            geocoder = new Geocoder({
+                map: map ,
+                autoComplete: true
+            }, "geocode");
+            geocoder.startup();
+
 
 
 
@@ -91,5 +129,7 @@
 <body>
 <div id="map"></div>
 <div id="BasemapToggle"></div>
+<div id="geocode"></div>
+
 </body>
 </html>
