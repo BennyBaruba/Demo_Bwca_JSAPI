@@ -30,6 +30,15 @@
             top: 20px;
             left: 74px;
         }
+        #queryBurnAreas {
+            height: 30px;
+            width: 100px;
+            display: block;
+            position: absolute;
+            z-index: 2;
+            bottom: 20px;
+            left: 20px;
+        }
     </style>
     <script src="http://js.arcgis.com/3.12/"></script>
     <script>
@@ -48,14 +57,22 @@
             "esri/graphic",
             "esri/symbols/SimpleMarkerSymbol",
             "esri/symbols/SimpleLineSymbol",
+            "esri/symbols/SimpleFillSymbol",
             "esri/Color",
+            "esri/InfoTemplate",
+            "esri/tasks/query",
+            "esri/geometry/Circle",
+
+            "dojo/on",
+            "dojo/dom",
 
             "dojo/domReady!"], function
                 (Map,Tiled,ArcGISDynamicMapServiceLayer, Extent,
                  SpatialReference,FeatureLayer,BasemapToggle,OverviewMap,Geocoder,Graphic,SimpleMarkerSymbol,
-                SimpleLineSymbol,
-                Color) {
+                SimpleLineSymbol,SimpleFillSymbol,
+                Color,InfoTemplate,Query,Circle,on, dom) {
 
+            //parser.parse();
             var setExtent = new Extent(-10403509, 5993812, -9933880, 6210894,
                     new SpatialReference({wkid: 102100}));
 
@@ -65,6 +82,8 @@
                // zoom: 10,
                 extent: setExtent
             });
+
+            on(dom.byId("queryBurnAreas"), "click", queryBurnAreas);
 
             var tiledBlowDown = new Tiled("http://tiles.arcgis.com/tiles/vq6gDtLASJCfTxvY/arcgis/rest/services/BlowdownAreas/MapServer");
 
@@ -82,6 +101,24 @@
 
             map.addLayer(featureLayerBWCABND);
 
+            var featureLayer_Fire = new FeatureLayer("http://services.arcgis.com/vq6gDtLASJCfTxvY/arcgis/rest/services/Bwca/FeatureServer/3", {
+                opacity: 0.5
+            });
+            map.addLayer(featureLayer_Fire);
+
+            var featureLayer_PortageTrail = new FeatureLayer("http://services.arcgis.com/vq6gDtLASJCfTxvY/arcgis/rest/services/Bwca/FeatureServer/2", {});
+            map.addLayer(featureLayer_PortageTrail);
+
+            var featureLayer_Campsite = new FeatureLayer("http://services.arcgis.com/vq6gDtLASJCfTxvY/arcgis/rest/services/Bwca/FeatureServer/1", {});
+            map.addLayer(featureLayer_Campsite);
+
+            var infoTemplate = new InfoTemplate("${NAME}", "Entry Point Number:  ${ENTRY_NUMBER:NumberFormat}");
+            var featureLayer_EntryPoint = new FeatureLayer("http://services.arcgis.com/vq6gDtLASJCfTxvY/arcgis/rest/services/Bwca/FeatureServer/0", {
+                outFields: ["*"],
+                infoTemplate: infoTemplate
+            });
+            map.addLayer(featureLayer_EntryPoint);
+
             //graphics
 
             map.on("click", addRedPoint);
@@ -95,7 +132,49 @@
 
                 var graphic = new Graphic(evt.mapPoint, pointSymbol);
                 map.graphics.add(graphic);
-            }
+
+                //query campsites
+                var symbol = new SimpleMarkerSymbol(
+                        SimpleMarkerSymbol.STYLE_CIRCLE,
+                        12,
+                        new SimpleLineSymbol(
+                                SimpleLineSymbol.STYLE_NULL,
+                                new Color([247, 34, 101, 0.9]),
+                                1
+                        ),
+                        new Color([207, 34, 171, 0.5])
+                );
+                featureLayer_Campsite.setSelectionSymbol(symbol);
+
+                var circleSymb = new SimpleFillSymbol(
+                        SimpleFillSymbol.STYLE_NULL,
+                        new SimpleLineSymbol(
+                                SimpleLineSymbol.STYLE_SHORTDASHDOTDOT,
+                                new Color([105, 105, 105]),
+                                2
+                        ), new Color([255, 255, 0, 0.25])
+                );
+                var circle;
+                circle = new Circle({
+                    center: evt.mapPoint,
+                    geodesic: true,
+                    radius: 3,
+                    radiusUnit: "esriMiles"
+                });
+                map.graphics.clear();
+                map.infoWindow.hide();
+                var graphic = new Graphic(circle, circleSymb);
+                map.graphics.add(graphic);
+
+                var queryCircle = new Query();
+                queryCircle.geometry = circle.getExtent();
+                //use a fast bounding box query. will only go to the server if bounding box is outside of the visible map
+                featureLayer_Campsite.selectFeatures(queryCircle, FeatureLayer.SELECTION_NEW);
+
+
+
+
+        }
 
 
 
@@ -119,7 +198,21 @@
             geocoder.startup();
 
 
+//Ask questions of your data
+            function queryBurnAreas(){
 
+                var fieldsSelectionSymbol =
+                        new SimpleFillSymbol(SimpleFillSymbol.STYLE_SOLID,
+                                new SimpleLineSymbol(SimpleLineSymbol.STYLE_DASHDOT,
+                                        new Color([255, 0, 0]), 2), new Color([255, 255, 0, 0.5]));
+                featureLayer_Fire.setSelectionSymbol(fieldsSelectionSymbol);
+                //set up query
+                var selectQuery = new Query();
+                selectQuery.where = "FIRE_YEAR = 2010";
+
+
+                featureLayer_Fire.selectFeatures(selectQuery, FeatureLayer.SELECTION_NEW);
+            }
 
 
         });
@@ -130,6 +223,7 @@
 <div id="map"></div>
 <div id="BasemapToggle"></div>
 <div id="geocode"></div>
+<input id="queryBurnAreas" type="button" value="Query Fire Areas">
 
 </body>
 </html>
