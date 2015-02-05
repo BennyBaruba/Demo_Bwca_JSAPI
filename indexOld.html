@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1,user-scalable=no"/>
+    <title>Simple Map</title>
+    <link rel="stylesheet" href="http://js.arcgis.com/3.12/dijit/themes/claro/claro.css">
+    <link rel="stylesheet" href="http://js.arcgis.com/3.12/esri/css/esri.css">
+    <style>
+        html, body, #map {
+            height: 100%;
+            width: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: #FFF;
+            overflow: hidden;
+            font-family: "Trebuchet MS";
+        }
+
+        #HomeButton {
+            position: absolute;
+            top: 95px;
+            left: 20px;
+            z-index: 50;
+        }
+
+        #LocateButton {
+            position: absolute;
+            top: 140px;
+            left: 20px;
+            z-index: 50;
+        }
+    </style>
+    <script src="http://js.arcgis.com/3.12/"></script>
+    <script>
+        var map;
+
+        require(["esri/map",
+                    "esri/layers/ArcGISTiledMapServiceLayer",
+                    "esri/layers/ArcGISDynamicMapServiceLayer",
+                    "esri/layers/FeatureLayer",
+                    "esri/InfoTemplate",
+                    "esri/geometry/Extent",
+                    "esri/SpatialReference",
+                    "esri/arcgis/utils",
+
+                    "esri/dijit/BasemapGallery",
+                    "esri/dijit/HomeButton",
+                    "esri/dijit/LocateButton",
+                    "esri/dijit/OverviewMap",
+                    "esri/dijit/Scalebar",
+
+                    "dojo/parser",
+
+                    //"dijit/layout/BorderContainer",
+                    //"dijit/layout/ContentPane",
+                    //"dijit/TitlePane",
+
+                    "dojo/domReady!"],
+                function (Map,
+                          Tiled,
+                          ArcGISDynamicMapServiceLayer,
+                          FeatureLayer,
+                          InfoTemplate,
+                          Extent,
+                          SpatialReference,
+                          utils,
+                          BasemapGallery,
+                          HomeButton,
+                          LocateButton,
+                          OverviewMap,
+                          Scalebar,
+                          parser) {
+
+                    //var setExtent = new Extent(-10403509, 5993812, -9933880, 6210894,
+                            //new SpatialReference({wkid: 102100}));
+
+
+
+                    map = new Map("map", {
+                        basemap: "topo",
+                        //extent: setExtent
+                        center: [-91.436, 47.980], // longitude, latitude 47.9022° N, 91.8558° W
+                        zoom: 10
+                    });
+                    //Adding Layers
+                    var tiled_BlowdownAreas = new Tiled("http://tiles.arcgis.com/tiles/vq6gDtLASJCfTxvY/arcgis/rest/services/BlowdownAreas/MapServer", {opacity: 0.5});
+                    map.addLayer(tiled_BlowdownAreas);
+
+                    //Takes a URL to a non cached map service.
+                    var dynamicMapServiceLayer_PublicLands = new ArcGISDynamicMapServiceLayer("http://sampleserver6.arcgisonline.com/arcgis/rest/services/USA/MapServer", {
+                        "opacity": 0.5
+                    });
+                    dynamicMapServiceLayer_PublicLands.setVisibleLayers([3]);
+
+                    var featureLayer_BWCABND = new FeatureLayer("http://services.arcgis.com/vq6gDtLASJCfTxvY/arcgis/rest/services/Bwca/FeatureServer/5", {});
+                    map.addLayer(featureLayer_BWCABND);
+
+                    var featureLayer_Fire = new FeatureLayer("http://services.arcgis.com/vq6gDtLASJCfTxvY/arcgis/rest/services/Bwca/FeatureServer/3", {
+                        opacity: 0.5
+                    });
+                    map.addLayer(featureLayer_Fire);
+
+                    var featureLayer_PortageTrail = new FeatureLayer("http://services.arcgis.com/vq6gDtLASJCfTxvY/arcgis/rest/services/Bwca/FeatureServer/2", {});
+                    map.addLayer(featureLayer_PortageTrail);
+
+                    var featureLayer_Campsite = new FeatureLayer("http://services.arcgis.com/vq6gDtLASJCfTxvY/arcgis/rest/services/Bwca/FeatureServer/1", {});
+                    map.addLayer(featureLayer_Campsite);
+
+                    var infoTemplate = new InfoTemplate("${NAME}", "Entry Point Number:  ${ENTRY_NUMBER:NumberFormat}");
+                    var featureLayer_EntryPoint = new FeatureLayer("http://services.arcgis.com/vq6gDtLASJCfTxvY/arcgis/rest/services/Bwca/FeatureServer/0", {
+                        outFields: ["*"],
+                        infoTemplate: infoTemplate
+                    });
+                    map.addLayer(featureLayer_EntryPoint);
+
+                    //Map related widgets
+                    //add the basemap gallery
+                    var basemapGallery = new BasemapGallery({
+                        showArcGISBasemaps: true,
+                        map: map
+                    }, "basemapGallery");
+                    basemapGallery.startup();
+
+                    basemapGallery.on("error", function (msg) {
+                        console.log("basemap gallery error:  ", msg);
+                    });
+                    //Add a Home button
+                    var home = new HomeButton({
+                        map: map
+                    }, "HomeButton");
+                    home.startup();
+
+                    //Add Locate button
+                    geoLocate = new LocateButton({
+                        map: map
+                    }, "LocateButton");
+                    geoLocate.startup();
+
+                    //Add overviewmap
+                    var overviewMapDijit = new OverviewMap({
+                        map: map,
+                        visible: false
+                    });
+                    overviewMapDijit.startup();
+
+                    //Add scalebar
+                    var scalebar = new Scalebar({
+                        map: map,
+                        // "dual" displays both miles and kilmometers
+                        // "english" is the default, which displays miles
+                        // use "metric" for kilometers
+                        scalebarUnit: "dual"
+                    });
+
+                });
+    </script>
+<body class="claro">
+<div id="map">
+    <div style="position:absolute; right:20px; top:10px; z-Index:999;">
+        <div data-dojo-type="dijit/TitlePane"
+             data-dojo-props="title:'Switch Basemap', closable:false, open:false">
+            <div data-dojo-type="dijit/layout/ContentPane" style="width:380px; height:500px; overflow:auto;">
+                <div id="basemapGallery"></div>
+            </div>
+        </div>
+
+    </div>
+    <div id="HomeButton"></div>
+    <div id="LocateButton"></div>
+</div>
+
+</body>
+</html>
