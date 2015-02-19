@@ -5,40 +5,9 @@
     <meta name="viewport" content="initial-scale=1, maximum-scale=1,user-scalable=no"/>
     <title>Simple Map</title>
     <link rel="stylesheet" href="http://js.arcgis.com/3.12/esri/css/esri.css">
+    <link rel="stylesheet" href="css/layout.css"/>
     <style>
-        html, body, #map {
-            height: 100%;
-            width: 100%;
-            margin: 0;
-            padding: 0;
-        }
-        body {
-            background-color: #FFF;
-            overflow: hidden;
-            font-family: "Trebuchet MS";
-        }
-        #BasemapToggle {
-            position: absolute;
-            top: 150px;
-            left: 20px;
-            z-index: 50;
-        }
-        #geocode{
-            display: block;
-            position: absolute;
-            z-index: 2;
-            top: 20px;
-            left: 74px;
-        }
-        #queryBurnAreas {
-            height: 30px;
-            width: 100px;
-            display: block;
-            position: absolute;
-            z-index: 2;
-            bottom: 20px;
-            left: 20px;
-        }
+
     </style>
     <script src="http://js.arcgis.com/3.12/"></script>
     <script>
@@ -94,9 +63,19 @@
             gp.setOutputSpatialReference({
                 wkid: 102100
             });
+
             //Events in web app
 
-            map.on("click", addRedPoint);
+           map.on("click", addRedPoint);
+
+
+            map.on("load", function() {
+                //after map loads, connect to listen to mouse move & drag events
+                map.on("mouse-move", queryCampsites);
+                map.on("mouse-drag", queryCampsites);
+            });
+
+
             on(dom.byId("queryBurnAreas"), "click", queryBurnAreas);
 
             var tiledBlowDown = new Tiled("http://tiles.arcgis.com/tiles/vq6gDtLASJCfTxvY/arcgis/rest/services/BlowdownAreas/MapServer");
@@ -164,6 +143,8 @@
                 var graphic = new Graphic(evt.mapPoint, pointSymbol);
                 map.graphics.add(graphic);
 
+
+
                 var features = [];
                 features.push(graphic);
                 var featureSet = new FeatureSet();
@@ -176,6 +157,7 @@
                     "Viewshed_Distance": vsDistance
                 };
                 gp.execute(params, drawViewshed);
+
             }
 
             function drawViewshed(results, messages) {
@@ -191,50 +173,66 @@
                 map.setExtent(graphicsUtils.graphicsExtent(map.graphics.graphics), true);
             }
 
-//                //query campsites
-//                var symbol = new SimpleMarkerSymbol(
-//                        SimpleMarkerSymbol.STYLE_CIRCLE,
-//                        12,
-//                        new SimpleLineSymbol(
-//                                SimpleLineSymbol.STYLE_NULL,
-//                                new Color([247, 34, 101, 0.9]),
-//                                1
-//                        ),
-//                        new Color([207, 34, 171, 0.5])
-//                );
-//                featureLayer_Campsite.setSelectionSymbol(symbol);
-//
-//                var circleSymb = new SimpleFillSymbol(
-//                        SimpleFillSymbol.STYLE_NULL,
-//                        new SimpleLineSymbol(
-//                                SimpleLineSymbol.STYLE_SHORTDASHDOTDOT,
-//                                new Color([105, 105, 105]),
-//                                2
-//                        ), new Color([255, 255, 0, 0.25])
-//                );
-//                var circle;
-//                circle = new Circle({
-//                    center: evt.mapPoint,
-//                    geodesic: true,
-//                    radius: 3,
-//                    radiusUnit: "esriMiles"
-//                });
-//                map.graphics.clear();
-//                map.infoWindow.hide();
-//                var graphic = new Graphic(circle, circleSymb);
-//                map.graphics.add(graphic);
-//
-//                var queryCircle = new Query();
-//                queryCircle.geometry = circle.getExtent();
-//                //use a fast bounding box query. will only go to the server if bounding box is outside of the visible map
-//                featureLayer_Campsite.selectFeatures(queryCircle, FeatureLayer.SELECTION_NEW);
+
+// query campsites
+
+            function queryCampsites(evt)
+            {
+
+                var symbol = new SimpleMarkerSymbol(
+                        SimpleMarkerSymbol.STYLE_CIRCLE,
+                        12,
+                        new SimpleLineSymbol(
+                                SimpleLineSymbol.STYLE_NULL,
+                                new Color([247, 34, 101, 0.9]),
+                                1
+                        ),
+                        new Color([207, 34, 171, 0.5])
+                );
+                featureLayer_Campsite.setSelectionSymbol(symbol);
+
+                var circleSymb = new SimpleFillSymbol(
+                        SimpleFillSymbol.STYLE_NULL,
+                        new SimpleLineSymbol(
+                                SimpleLineSymbol.STYLE_SHORTDASHDOTDOT,
+                                new Color([105, 105, 105]),
+                                2
+                        ), new Color([255, 255, 0, 0.25])
+                );
+                var circle;
+                circle = new Circle({
+                    center: evt.mapPoint,
+                    geodesic: true,
+                    radius: 3,
+                    radiusUnit: "esriMiles"
+                });
+                map.graphics.clear();
+                map.infoWindow.hide();
+                var graphic = new Graphic(circle, circleSymb);
+                map.graphics.add(graphic);
+
+                var queryCircle = new Query();
+                queryCircle.geometry = circle.getExtent();
+                //use a fast bounding box query. will only go to the server if bounding box is outside of the visible map
+                featureLayer_Campsite.selectFeatures(queryCircle, FeatureLayer.SELECTION_NEW);
+
+            }
 
 
+//Ask questions of your data
+            function queryBurnAreas(){
 
+                var fieldsSelectionSymbol =
+                        new SimpleFillSymbol(SimpleFillSymbol.STYLE_SOLID,
+                                new SimpleLineSymbol(SimpleLineSymbol.STYLE_DASHDOT,
+                                        new Color([255, 0, 0]), 2), new Color([255, 255, 0, 0.5]));
+                featureLayer_Fire.setSelectionSymbol(fieldsSelectionSymbol);
+                //set up query
+                var selectQuery = new Query();
+                selectQuery.where = "FIRE_YEAR = 2010";
 
-
-
-
+                featureLayer_Fire.selectFeatures(selectQuery, FeatureLayer.SELECTION_NEW);
+            }
 
             //Add widget
             var toggle = new BasemapToggle({
@@ -256,21 +254,7 @@
             geocoder.startup();
 
 
-//Ask questions of your data
-            function queryBurnAreas(){
 
-                var fieldsSelectionSymbol =
-                        new SimpleFillSymbol(SimpleFillSymbol.STYLE_SOLID,
-                                new SimpleLineSymbol(SimpleLineSymbol.STYLE_DASHDOT,
-                                        new Color([255, 0, 0]), 2), new Color([255, 255, 0, 0.5]));
-                featureLayer_Fire.setSelectionSymbol(fieldsSelectionSymbol);
-                //set up query
-                var selectQuery = new Query();
-                selectQuery.where = "FIRE_YEAR = 2010";
-
-
-                featureLayer_Fire.selectFeatures(selectQuery, FeatureLayer.SELECTION_NEW);
-            }
 
 
         });
@@ -282,6 +266,8 @@
 <div id="BasemapToggle"></div>
 <div id="geocode"></div>
 <input id="queryBurnAreas" type="button" value="Query Fire Areas">
+
+
 
 </body>
 </html>
