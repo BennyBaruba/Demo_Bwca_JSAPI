@@ -6,5 +6,6 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="JSAPI Typescript" level="application" />
     <orderEntry type="library" name="JSAPI TypeScript" level="application" />
+    <orderEntry type="library" name="ArcGIS TypeScript" level="application" />
   </component>
 </module>

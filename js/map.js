@@ -21,6 +21,7 @@ require(["esri/map",
     "esri/InfoTemplate",
     "esri/tasks/query",
     "esri/geometry/Circle",
+
     "esri/renderers/UniqueValueRenderer",
 
     "esri/tasks/Geoprocessor",
