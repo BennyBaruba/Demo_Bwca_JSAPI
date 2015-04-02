@@ -10,7 +10,7 @@ require(["esri/map",
     "esri/dijit/BasemapToggle",
     "esri/dijit/OverviewMap",
     "esri/dijit/BasemapGallery",
-    "esri/dijit/Geocoder",
+    "esri/dijit/Search",
 
     "esri/graphic",
     "esri/symbols/SimpleMarkerSymbol",
@@ -42,7 +42,7 @@ require(["esri/map",
      BasemapToggle,
      OverviewMap,
      BasemapGallery,
-     Geocoder,
+     Search,
      Graphic,
      SimpleMarkerSymbol,
      SimpleLineSymbol,
@@ -66,8 +66,8 @@ require(["esri/map",
         featureLayer_PortageTrail,featureLayer_Campsite,featureLayer_EntryPoint;
 
     //Optional Extent Setting using a bounding box
-//            var setExtent = new Extent(-10403509, 5993812, -9933880, 6210894,
-//                    new SpatialReference({wkid: 102100}));
+    //var setExtent = new Extent(-10403509, 5993812, -9933880, 6210894,
+    //                new SpatialReference({wkid: 102100}));
 
     map = new Map("map", {
         basemap: "topo",
@@ -271,11 +271,10 @@ require(["esri/map",
         });
         overviewMapDijit.startup();
 
-        geocoder = new Geocoder({
-            map: map,
-            autoComplete: true
-        }, "geocode");
-        geocoder.startup();
+        var search = new Search({
+            map: map
+        }, "search");
+        search.startup();
 
     }
 
