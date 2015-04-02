@@ -1,5 +1,4 @@
-var map, gp;
-
+var map;
 
 require(["esri/map",
     "esri/layers/ArcGISTiledMapServiceLayer",
@@ -62,6 +61,11 @@ require(["esri/map",
      dom) {
 
     parser.parse();
+
+    var  gp, tiledBlowDown, featureLayerBWCABND, dynamicMapServiceLayerUSA, featureLayer_Fire,
+        featureLayer_PortageTrail,featureLayer_Campsite,featureLayer_EntryPoint;
+
+    //Optional Extent Setting using a bounding box
 //            var setExtent = new Extent(-10403509, 5993812, -9933880, 6210894,
 //                    new SpatialReference({wkid: 102100}));
 
@@ -71,54 +75,57 @@ require(["esri/map",
         zoom: 10
         //extent: setExtent
     });
+
+    //Setting up the GP
     gp = new Geoprocessor("http://sampleserver6.arcgisonline.com/ArcGIS/rest/services/Elevation/ESRI_Elevation_World/GPServer/Viewshed");
     gp.setOutputSpatialReference({
         wkid: 102100
     });
 
     //Events in web app
-
     map.on("click", addRedPoint);
 
-
     map.on("load", function() {
+        addLayers();
+        addWidgets();
         //after map loads, connect to listen to mouse move & drag events
         map.on("mouse-move", queryCampsites);
         map.on("mouse-drag", queryCampsites);
+        on(dom.byId("queryBurnAreas"), "click", queryBurnAreas);
+
     });
 
+    function addLayers(){
 
-    on(dom.byId("queryBurnAreas"), "click", queryBurnAreas);
-
-    var tiledBlowDown = new Tiled("http://tiles.arcgis.com/tiles/vq6gDtLASJCfTxvY/arcgis/rest/services/BlowdownAreas/MapServer");
+    tiledBlowDown = new Tiled("http://tiles.arcgis.com/tiles/vq6gDtLASJCfTxvY/arcgis/rest/services/BlowdownAreas/MapServer");
 
     map.addLayer(tiledBlowDown);
 
-    var dynamicMapServiceLayerUSA = new ArcGISDynamicMapServiceLayer("http://sampleserver6.arcgisonline.com/arcgis/rest/services/USA/MapServer", {
+    dynamicMapServiceLayerUSA = new ArcGISDynamicMapServiceLayer("http://sampleserver6.arcgisonline.com/arcgis/rest/services/USA/MapServer", {
         "opacity" : 0.5
     });
     dynamicMapServiceLayerUSA.setVisibleLayers([0,1]);
     map.addLayer(dynamicMapServiceLayerUSA);
 
-    var featureLayerBWCABND = new FeatureLayer("http://services.arcgis.com/vq6gDtLASJCfTxvY/ArcGIS/rest/services/Bwca/FeatureServer/5",{
+    featureLayerBWCABND = new FeatureLayer("http://services.arcgis.com/vq6gDtLASJCfTxvY/ArcGIS/rest/services/Bwca/FeatureServer/5",{
 
     });
 
     map.addLayer(featureLayerBWCABND);
 
-    var featureLayer_Fire = new FeatureLayer("http://services.arcgis.com/vq6gDtLASJCfTxvY/arcgis/rest/services/Bwca/FeatureServer/3", {
+    featureLayer_Fire = new FeatureLayer("http://services.arcgis.com/vq6gDtLASJCfTxvY/arcgis/rest/services/Bwca/FeatureServer/3", {
         opacity: 0.5
     });
     map.addLayer(featureLayer_Fire);
 
-    var featureLayer_PortageTrail = new FeatureLayer("http://services.arcgis.com/vq6gDtLASJCfTxvY/arcgis/rest/services/Bwca/FeatureServer/2", {});
+    featureLayer_PortageTrail = new FeatureLayer("http://services.arcgis.com/vq6gDtLASJCfTxvY/arcgis/rest/services/Bwca/FeatureServer/2", {});
     map.addLayer(featureLayer_PortageTrail);
 
-    var featureLayer_Campsite = new FeatureLayer("http://services.arcgis.com/vq6gDtLASJCfTxvY/arcgis/rest/services/Bwca/FeatureServer/1", {});
+    featureLayer_Campsite = new FeatureLayer("http://services.arcgis.com/vq6gDtLASJCfTxvY/arcgis/rest/services/Bwca/FeatureServer/1", {});
     map.addLayer(featureLayer_Campsite);
 
     var infoTemplate = new InfoTemplate("${NAME}", "Entry Point Number:  ${ENTRY_NUMBER:NumberFormat}");
-    var featureLayer_EntryPoint = new FeatureLayer("http://services.arcgis.com/vq6gDtLASJCfTxvY/arcgis/rest/services/Bwca/FeatureServer/0", {
+    featureLayer_EntryPoint = new FeatureLayer("http://services.arcgis.com/vq6gDtLASJCfTxvY/arcgis/rest/services/Bwca/FeatureServer/0", {
         outFields: ["*"],
         infoTemplate: infoTemplate
     });
@@ -141,9 +148,7 @@ require(["esri/map",
     featureLayer_EntryPoint.setRenderer(renderer);
     map.addLayer(featureLayer_EntryPoint);
 
-    //graphics
-
-
+    }
 
     function addRedPoint(evt) {
         map.graphics.clear();
@@ -185,12 +190,8 @@ require(["esri/map",
         map.setExtent(graphicsUtils.graphicsExtent(map.graphics.graphics), true);
     }
 
-
-// query campsites
-
-    function queryCampsites(evt)
-    {
-
+    function queryCampsites(evt) {
+        // query campsites
         var symbol = new SimpleMarkerSymbol(
             SimpleMarkerSymbol.STYLE_CIRCLE,
             12,
@@ -230,8 +231,6 @@ require(["esri/map",
 
     }
 
-
-//Ask questions of your data
     function queryBurnAreas(){
 
         var fieldsSelectionSymbol =
@@ -246,37 +245,39 @@ require(["esri/map",
         featureLayer_Fire.selectFeatures(selectQuery, FeatureLayer.SELECTION_NEW);
     }
 
-    //Add widget
-    var toggle = new BasemapToggle({
-        map: map,
-        basemap: "satellite"
-    }, "BasemapToggle");
-    toggle.startup();
+    function addWidgets() {
 
-    //add the basemap gallery, in this case we'll display maps from ArcGIS.com including bing maps
-    var basemapGallery = new BasemapGallery({
-        showArcGISBasemaps: true,
-        map: map
-    }, "basemapGallery");
-    basemapGallery.startup();
+//Add widget
+        var toggle = new BasemapToggle({
+            map: map,
+            basemap: "satellite"
+        }, "BasemapToggle");
+        toggle.startup();
 
-    basemapGallery.on("error", function(msg) {
-        console.log("basemap gallery error:  ", msg);
-    });
+//add the basemap gallery, in this case we'll display maps from ArcGIS.com including bing maps
+        var basemapGallery = new BasemapGallery({
+            showArcGISBasemaps: true,
+            map: map
+        }, "basemapGallery");
+        basemapGallery.startup();
 
-    var overviewMapDijit = new OverviewMap({
-        map: map,
-        visible: true
-    });
-    overviewMapDijit.startup();
+        basemapGallery.on("error", function (msg) {
+            console.log("basemap gallery error:  ", msg);
+        });
 
-    geocoder = new Geocoder({
-        map: map ,
-        autoComplete: true
-    }, "geocode");
-    geocoder.startup();
+        var overviewMapDijit = new OverviewMap({
+            map: map,
+            visible: true
+        });
+        overviewMapDijit.startup();
 
+        geocoder = new Geocoder({
+            map: map,
+            autoComplete: true
+        }, "geocode");
+        geocoder.startup();
 
+    }
 
 
 
