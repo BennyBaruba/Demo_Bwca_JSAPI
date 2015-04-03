@@ -63,7 +63,7 @@ require(["esri/map",
     parser.parse();
 
     var  gp, tiledBlowDown, featureLayerBWCABND, dynamicMapServiceLayerUSA, featureLayer_Fire,
-        featureLayer_PortageTrail,featureLayer_Campsite,featureLayer_EntryPoint;
+        featureLayer_PortageTrail,featureLayer_Campsite, featureLayer_EntryPoint;
 
     //Optional Extent Setting using a bounding box
     //var setExtent = new Extent(-10403509, 5993812, -9933880, 6210894,
