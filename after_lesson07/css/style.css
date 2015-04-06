@@ -1,0 +1,33 @@
+html, body, #divMap {
+    height: 100%;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background-color: #FFF;
+    overflow: hidden;
+    font-family: "Trebuchet MS";
+}
+
+#bcMain {
+    width: 100%;
+    height: 100%;
+}
+
+#cpTop {
+    height: 25px;
+}
+
+#cpLeft {
+    width: 215px;
+    overflow: hidden;
+}
+
+#BasemapToggle {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    z-index: 50;
+}

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+  <meta charset="UTF-8">
+
+  <title>CodePen - after_Lesson07</title>
+
+    <link rel="stylesheet" href="css/style.css">
+
+</head>
+
+<body>
+
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>Edit Features</title>
+
+    <!-- Configure dojo for asynchronous module loading -->
+    <script>
+        var dojoConfig = {
+            async: true
+        };
+    </script>
+
+    <!-- Reference libraries. The first CSS is a Dojo theme that gives dijits a consistent style. -->
+    <link rel="stylesheet" href="http://js.arcgis.com/3.12/dijit/themes/nihilo/nihilo.css">
+    <link rel="stylesheet" href="http://js.arcgis.com/3.12/esri/css/esri.css">
+
+    <script src="http://js.arcgis.com/3.12/"></script>
+
+</head>
+
+<body class="nihilo">
+<div id="bcMain" data-dojo-type="dijit/layout/BorderContainer" data-dojo-props="design:'sidebar'">
+    <div id="cpTop" data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region:'top'">
+        <div id="divTop"></div>
+    </div>
+    <div id="cpLeft" data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region:'right'">
+        <div id="divLeft"></div>
+    </div>
+    <div id="cpCenter" data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region:'center'">
+        <div id="divMap"></div>
+      <div id="BasemapToggle"></div>
+
+    </div>
+</div>
+</body>
+</html>
+
+  <script src="js/index.js"></script>
+
+</body>
+
+</html>
